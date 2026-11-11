@@ -25,7 +25,7 @@ Le sujet de l'atelier décrit une boulangerie (clients, publicité, réduction �
 | 5 | Évaluation : MAE, MSE, RMSE, R² | rapport, section « Partie 5 » |
 | 6 | Graphique réel vs prédit | `comparaison_notes_reelles_predites.png` |
 | 7 | Nouvelle prédiction et question finale | rapport, section « Partie 7 » |
-| + | Travail supplémentaire (nouvelle variable, 5 nouveaux élèves) | rapport + `donnees_enrichies_revision.csv` |
+| + | Travail supplémentaire (nouvelle variable, 5 nouveaux élèves) | rapport, section « Travail supplémentaire » |
 
 Les réponses à toutes les questions de l'atelier sont dans [`resultats_atelier3.txt`](resultats_atelier3.txt).
 
@@ -55,7 +55,7 @@ Le modèle explique environ **91 %** de la variation des notes finales sur le je
 
 ### Travail supplémentaire
 
-Ajout de la variable « heures de révision » et de 5 nouveaux élèves (105 lignes). Les deux modèles sont comparés sur le même dataset enrichi : le R² en validation croisée passe de 0,872 à 0,877 (+0,006). L'ajout de la variable n'améliore donc pas significativement les prédictions, car elle est déjà très liée aux trois notes. Les valeurs de cette variable sont **simulées**, puisque le CSV du professeur ne la contient pas.
+Ajout de la variable « heures de révision » et de 5 nouveaux élèves (105 lignes). Les deux modèles sont comparés sur le même dataset enrichi : le R² en validation croisée passe de 0,872 à 0,877 (+0,006). L'ajout de la variable n'améliore donc pas significativement les prédictions, car elle est déjà très liée aux trois notes. Les valeurs de cette variable sont **simulées**, puisque le CSV du professeur ne la contient pas. Elles sont ajoutées en mémoire : le projet n'utilise qu'un seul fichier CSV, celui du professeur.
 
 | Modèle | MAE | RMSE | R² (test) | R² (validation croisée) |
 |--------|-----|------|-----------|-------------------------|
@@ -72,7 +72,6 @@ Ajout de la variable « heures de révision » et de 5 nouveaux élèves (105 li
 ├── app.py                                    # Interface Streamlit
 ├── regression_notes.py                       # Programme complet de l'atelier (parties 2 à 7 + travail supplémentaire)
 ├── donnees_regression_lineaire_multiple.csv  # Dataset fourni par le professeur (100 élèves, 4 colonnes)
-├── donnees_enrichies_revision.csv            # Dataset enrichi généré (travail supplémentaire)
 ├── resultats_atelier3.txt                    # Rapport : réponses, coefficients, métriques, interprétation
 ├── comparaison_notes_reelles_predites.png    # Graphique généré par regression_notes.py
 └── requirements.txt
@@ -107,9 +106,6 @@ L'application permet :
 - de voir les métriques, le graphique et les coefficients du modèle ;
 - de saisir les notes d'un élève pour obtenir sa note finale prédite ;
 - de comparer l'ancien et le nouveau modèle (travail supplémentaire).
-
-La section « Travail supplémentaire » utilise `donnees_enrichies_revision.csv`. Ce fichier est fourni dans le dépôt et `python regression_notes.py` le recrée.
-
 ## Technologies
 
 Python · pandas · NumPy · scikit-learn · Matplotlib · Streamlit

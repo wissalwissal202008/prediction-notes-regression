@@ -10,7 +10,8 @@ Chaque partie de l'atelier est donc realisee sur ces notes :
 
 Execution : python regression_notes.py
 Sorties   : resultats_atelier3.txt, comparaison_notes_reelles_predites.png,
-            donnees_enrichies_revision.csv (travail supplementaire)
+Un seul CSV est utilise : celui du professeur. Les donnees du travail
+supplementaire sont construites en memoire a partir de ce CSV.
 """
 
 import sys
@@ -31,7 +32,6 @@ from sklearn.model_selection import KFold, cross_val_score, train_test_split
 
 BASE_DIR = Path(__file__).resolve().parent
 CSV_PATH = BASE_DIR / "donnees_regression_lineaire_multiple.csv"
-ENRICHED_CSV_PATH = BASE_DIR / "donnees_enrichies_revision.csv"
 CHART_PATH = BASE_DIR / "comparaison_notes_reelles_predites.png"
 REPORT_PATH = BASE_DIR / "resultats_atelier3.txt"
 
@@ -306,7 +306,6 @@ def main() -> None:
 
     # ---------------- Travail supplementaire ----------------
     enriched = build_enriched_dataset(df, model)
-    enriched.to_csv(ENRICHED_CSV_PATH, index=False, encoding="utf-8-sig")
     features_new = [*FEATURES, NEW_FEATURE]
 
     Xo_train, Xo_test, yo_train, yo_test = split_data(enriched, FEATURES)
@@ -336,7 +335,7 @@ def main() -> None:
         "   ATTENTION : le CSV du professeur ne contient pas cette variable ; ses",
         "   valeurs sont SIMULEES (graine fixe) a partir du niveau de l'eleve.",
         f"2. {len(NEW_STUDENTS)} nouveaux eleves ajoutes -> {len(enriched)} lignes",
-        f"   (fichier : {ENRICHED_CSV_PATH.name}).",
+        f"   (construites en memoire a partir de {CSV_PATH.name}).",
         "   Nouveaux eleves :",
         enriched.tail(len(NEW_STUDENTS)).to_string(index=False),
         "3. Les deux modeles sont reentraines sur le MEME dataset enrichi et le",

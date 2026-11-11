@@ -1,13 +1,12 @@
 """Interface Streamlit pour explorer et utiliser le modele des notes."""
 
-from pathlib import Path
-
 import pandas as pd
 import streamlit as st
 from regression_notes import (
     FEATURES,
     NEW_FEATURE,
     NEW_STUDENT,
+    build_enriched_dataset,
     calculate_metrics,
     cross_validated_r2,
     load_dataset,
@@ -114,26 +113,19 @@ st.caption(
 
 st.subheader("Travail supplémentaire : ajout des heures de révision")
 st.caption(
-    "Variable absente du CSV du professeur : valeurs simulées, générées par "
-    "`python regression_notes.py` dans `donnees_enrichies_revision.csv`."
+    "Variable absente du CSV du professeur : valeurs simulées, ajoutées en "
+    "mémoire aux données du CSV (avec 5 nouveaux élèves)."
 )
-try:
-    enriched = load_dataset(
-        Path(__file__).resolve().parent / "donnees_enrichies_revision.csv",
-        [*FEATURES, NEW_FEATURE],
+enriched = build_enriched_dataset(df, model)
+rows = {}
+for label, features in {
+    "Ancien (3 variables)": FEATURES,
+    "Nouveau (4 variables)": [*FEATURES, NEW_FEATURE],
+}.items():
+    Xe_train, Xe_test, ye_train, ye_test = split_data(enriched, features)
+    scores = calculate_metrics(
+        ye_test, train_model(Xe_train, ye_train).predict(Xe_test)
     )
-except (FileNotFoundError, ValueError) as error:
-    st.info(f"Lancez d'abord `python regression_notes.py`. ({error})")
-else:
-    rows = {}
-    for label, features in {
-        "Ancien (3 variables)": FEATURES,
-        "Nouveau (4 variables)": [*FEATURES, NEW_FEATURE],
-    }.items():
-        Xe_train, Xe_test, ye_train, ye_test = split_data(enriched, features)
-        scores = calculate_metrics(
-            ye_test, train_model(Xe_train, ye_train).predict(Xe_test)
-        )
-        scores["R2 validation croisée"] = cross_validated_r2(enriched, features)
-        rows[label] = scores
-    st.dataframe(pd.DataFrame(rows).style.format("{:.4f}"), width="stretch")
+    scores["R2 validation croisée"] = cross_validated_r2(enriched, features)
+    rows[label] = scores
+st.dataframe(pd.DataFrame(rows).style.format("{:.4f}"), width="stretch")

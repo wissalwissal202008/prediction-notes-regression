@@ -151,7 +151,7 @@ Question finale : si la note de math augmente de 2 points
    ATTENTION : le CSV du professeur ne contient pas cette variable ; ses
    valeurs sont SIMULEES (graine fixe) a partir du niveau de l'eleve.
 2. 5 nouveaux eleves ajoutes -> 105 lignes
-   (fichier : donnees_enrichies_revision.csv).
+   (construites en memoire a partir de donnees_regression_lineaire_multiple.csv).
    Nouveaux eleves :
  note math  note physique  note français  heures de révision  note finale
       12.5           13.0           11.0                 6.0        11.95
