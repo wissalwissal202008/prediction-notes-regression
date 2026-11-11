@@ -1,0 +1,76 @@
+ATELIER 3 - REGRESSION LINEAIRE MULTIPLE
+Fichier utilise : donnees_regression_lineaire_multiple.csv
+
+1. Exploration du dataset
+ note math  note physique  note français  note finale
+     16.61          18.63          16.66        17.10
+     11.58          15.50          19.58        15.27
+     17.88           8.99          12.51        12.96
+     15.46          19.54           7.16        14.52
+      6.41          16.68           5.21        10.82
+Dimensions : 100 lignes et 4 colonnes
+Informations generales :
+<class 'pandas.DataFrame'>
+RangeIndex: 100 entries, 0 to 99
+Data columns (total 4 columns):
+ #   Column         Non-Null Count  Dtype  
+---  ------         --------------  -----  
+ 0   note math      100 non-null    float64
+ 1   note physique  100 non-null    float64
+ 2   note français  100 non-null    float64
+ 3   note finale    100 non-null    float64
+dtypes: float64(4)
+memory usage: 3.3 KB
+Valeurs manquantes : 0
+Variables independantes X : note math, note physique, note français
+Variable a predire Y : note finale
+
+X contient les notes de mathematiques, physique et francais; Y est la note finale. Les donnees de test sont mises de cote pour evaluer le modele sur des eleves non utilises pour son entrainement.
+
+2. Entrainement (80 % apprentissage, 20 % test, random_state=42)
+Lignes d'entrainement : 80
+Lignes de test : 20
+Nombre de coefficients : 3
+Coefficient note math : 0.319783
+Coefficient note physique : 0.356092
+Coefficient note français : 0.305230
+Constante (intercept) : 0.271660
+Chaque coefficient estime la variation de la note finale pour un point supplementaire dans la matiere correspondante, les autres notes restant constantes. L'intercept est la prediction lorsque les trois notes valent zero.
+
+3. Notes reelles et predites sur le jeu de test
+       Note finale reelle  Note finale predite
+Eleve                                         
+1                   17.10                17.30
+5                   10.82                 9.85
+11                  11.06                12.57
+13                  12.27                10.82
+19                  15.52                15.70
+23                  14.46                13.32
+31                  11.23                10.30
+32                  15.88                16.68
+34                  11.30                11.54
+40                   9.39                 9.33
+45                  14.02                14.47
+46                  13.72                14.44
+54                  12.76                12.46
+71                   7.21                 8.01
+74                  14.11                14.01
+77                  10.16                10.37
+78                  17.14                15.97
+81                  13.52                13.32
+84                   9.72                 8.81
+91                  15.75                14.72
+
+4. Metriques d'evaluation
+MAE : 0.6682
+MSE : 0.6532
+RMSE : 0.8082
+R2 : 0.9076
+Le MAE indique l'erreur absolue moyenne en points. Le RMSE, lui aussi en points, penalise davantage les grandes erreurs. Un R2 proche de 1 signifie que le modele explique une grande part de la variation des notes finales.
+
+5. Exemple de nouvelle prediction
+Pour un eleve ayant les notes moyennes du CSV (note math : 12.30, note physique : 12.52, note français : 12.08), la note finale predite est 12.35/20.
+Selon le modele, un point supplementaire en mathematiques, a notes de physique et de francais constantes, modifie la note finale predite de 0.3198 point.
+
+Remarque : le CSV contient des notes scolaires et non les donnees de ventes de boulangerie du sujet. Le modele, les predictions et le graphique portent donc sur la note finale.
+Le travail supplementaire sur les commandes livrees ne peut pas etre effectue avec ce CSV : il ne contient ni donnees de boulangerie ni variable de commandes livrees.

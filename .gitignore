@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.ipynb_checkpoints/
+.streamlit/secrets.toml
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Sujet de l'atelier (document de cours, non publié)
+*.pdf
