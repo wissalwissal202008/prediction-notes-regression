@@ -1,15 +1,18 @@
 """Interface Streamlit pour explorer et utiliser le modele des notes."""
 
+from pathlib import Path
+
 import pandas as pd
 import streamlit as st
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
-
 from regression_notes import (
     FEATURES,
-    TARGET,
+    NEW_FEATURE,
+    NEW_STUDENT,
     calculate_metrics,
+    cross_validated_r2,
     load_dataset,
+    split_data,
+    train_model,
 )
 
 
@@ -36,12 +39,8 @@ except (FileNotFoundError, ValueError, UnicodeDecodeError, pd.errors.ParserError
     st.stop()
 
 X = df[FEATURES]
-y = df[TARGET]
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
-model = LinearRegression()
-model.fit(X_train, y_train)
+X_train, X_test, y_train, y_test = split_data(df)
+model = train_model(X_train, y_train)
 y_pred = model.predict(X_test)
 metrics = calculate_metrics(y_test, y_pred)
 
@@ -84,7 +83,7 @@ student_scores = {
         feature.capitalize(),
         min_value=0.0,
         max_value=20.0,
-        value=float(X[feature].mean()),
+        value=float(NEW_STUDENT[feature]),
         step=0.1,
         format="%.2f",
     )
@@ -93,6 +92,10 @@ student_scores = {
 new_student = pd.DataFrame([student_scores], columns=FEATURES)
 predicted_grade = float(model.predict(new_student)[0])
 st.success(f"Note finale prédite : **{predicted_grade:.2f} / 20**")
+st.caption(
+    f"Question finale : +2 points en math (autres notes inchangées) "
+    f"→ note finale {2 * model.coef_[0]:+.2f} point."
+)
 
 st.subheader("Coefficients du modèle")
 coefficients = pd.DataFrame(
@@ -108,3 +111,29 @@ st.caption(
     "Chaque coefficient estime l’effet d’un point supplémentaire dans "
     "la matière correspondante, à notes constantes dans les autres matières."
 )
+
+st.subheader("Travail supplémentaire : ajout des heures de révision")
+st.caption(
+    "Variable absente du CSV du professeur : valeurs simulées, générées par "
+    "`python regression_notes.py` dans `donnees_enrichies_revision.csv`."
+)
+try:
+    enriched = load_dataset(
+        Path(__file__).resolve().parent / "donnees_enrichies_revision.csv",
+        [*FEATURES, NEW_FEATURE],
+    )
+except (FileNotFoundError, ValueError) as error:
+    st.info(f"Lancez d'abord `python regression_notes.py`. ({error})")
+else:
+    rows = {}
+    for label, features in {
+        "Ancien (3 variables)": FEATURES,
+        "Nouveau (4 variables)": [*FEATURES, NEW_FEATURE],
+    }.items():
+        Xe_train, Xe_test, ye_train, ye_test = split_data(enriched, features)
+        scores = calculate_metrics(
+            ye_test, train_model(Xe_train, ye_train).predict(Xe_test)
+        )
+        scores["R2 validation croisée"] = cross_validated_r2(enriched, features)
+        rows[label] = scores
+    st.dataframe(pd.DataFrame(rows).style.format("{:.4f}"), width="stretch")

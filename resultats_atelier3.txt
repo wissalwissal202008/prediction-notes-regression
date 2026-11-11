@@ -1,14 +1,19 @@
 ATELIER 3 - REGRESSION LINEAIRE MULTIPLE
-Fichier utilise : donnees_regression_lineaire_multiple.csv
+Jeu de donnees fourni : donnees_regression_lineaire_multiple.csv
+Adaptation du sujet : la 'boulangerie' est remplacee par les notes
+d'eleves du CSV. Clients/Publicite/Reduction -> notes math/physique/
+français, et le chiffre d'affaires -> note finale.
 
-1. Exploration du dataset
+=== PARTIE 2 : Exploration du dataset ===
+Cinq premieres lignes :
  note math  note physique  note français  note finale
      16.61          18.63          16.66        17.10
      11.58          15.50          19.58        15.27
      17.88           8.99          12.51        12.96
      15.46          19.54           7.16        14.52
       6.41          16.68           5.21        10.82
-Dimensions : 100 lignes et 4 colonnes
+
+Dimensions : (100, 4)
 Informations generales :
 <class 'pandas.DataFrame'>
 RangeIndex: 100 entries, 0 to 99
@@ -21,56 +26,164 @@ Data columns (total 4 columns):
  3   note finale    100 non-null    float64
 dtypes: float64(4)
 memory usage: 3.3 KB
-Valeurs manquantes : 0
-Variables independantes X : note math, note physique, note français
-Variable a predire Y : note finale
 
-X contient les notes de mathematiques, physique et francais; Y est la note finale. Les donnees de test sont mises de cote pour evaluer le modele sur des eleves non utilises pour son entrainement.
+Valeurs manquantes par colonne :
+note math        0
+note physique    0
+note français    0
+note finale      0
 
-2. Entrainement (80 % apprentissage, 20 % test, random_state=42)
-Lignes d'entrainement : 80
-Lignes de test : 20
-Nombre de coefficients : 3
-Coefficient note math : 0.319783
-Coefficient note physique : 0.356092
-Coefficient note français : 0.305230
-Constante (intercept) : 0.271660
-Chaque coefficient estime la variation de la note finale pour un point supplementaire dans la matiere correspondante, les autres notes restant constantes. L'intercept est la prediction lorsque les trois notes valent zero.
+Statistiques descriptives :
+       note math  note physique  note français  note finale
+count     100.00         100.00         100.00       100.00
+mean       12.30          12.52          12.08        12.38
+std         4.10           4.38           4.60         2.45
+min         5.11           5.32           5.21         6.96
+25%         8.48           8.91           7.44        10.52
+50%        12.02          12.38          12.17        12.48
+75%        15.64          16.42          16.67        14.14
+max        19.63          19.89          19.69        17.17
 
-3. Notes reelles et predites sur le jeu de test
-       Note finale reelle  Note finale predite
-Eleve                                         
-1                   17.10                17.30
-5                   10.82                 9.85
-11                  11.06                12.57
-13                  12.27                10.82
-19                  15.52                15.70
-23                  14.46                13.32
-31                  11.23                10.30
-32                  15.88                16.68
-34                  11.30                11.54
-40                   9.39                 9.33
-45                  14.02                14.47
-46                  13.72                14.44
-54                  12.76                12.46
-71                   7.21                 8.01
-74                  14.11                14.01
-77                  10.16                10.37
-78                  17.14                15.97
-81                  13.52                13.32
-84                   9.72                 8.81
-91                  15.75                14.72
+Reponses :
+- Le dataset contient 100 lignes (eleves).
+- Il possede 3 variables independantes : note math, note physique, note français.
+- La variable a predire est la 'note finale'.
 
-4. Metriques d'evaluation
-MAE : 0.6682
-MSE : 0.6532
+=== PARTIE 3 : Preparation des donnees ===
+X = df[['note math', 'note physique', 'note français']]
+y = df['note finale']
+Entrainement : 80 lignes | Test : 20 lignes
+
+Reponses :
+- X contient les variables explicatives (les 3 notes) que le modele
+  utilise pour faire sa prediction.
+- Y est la valeur cible (note finale) que le modele doit apprendre a predire.
+- On separe entrainement et test pour evaluer le modele sur des eleves
+  qu'il n'a jamais vus : cela mesure sa capacite a generaliser et
+  detecte le sur-apprentissage.
+- X_train sert a entrainer le modele (80 %), X_test sert uniquement a
+  l'evaluer (20 %).
+
+=== PARTIE 4 : Entrainement du modele ===
+Coefficients : [0.319783 0.356092 0.30523 ]
+Constante    : 0.271660
+
+Equation apprise :
+  note finale = 0.3198 * math + 0.3561 * physique + 0.3052 * français + 0.2717
+
+Reponses :
+- Le modele a calcule 3 coefficients (un par variable independante).
+- a = 0.3198 (math), b = 0.3561 (physique), c = 0.3052 (français).
+- La constante (intercept) est la note finale predite quand les trois
+  notes valent 0 ; elle sert surtout a ajuster le niveau de la droite.
+- Il y a plusieurs coefficients car il y a plusieurs variables : chacune
+  a son propre effet sur la note finale.
+
+Interpretation (les autres notes restant constantes) :
+- +1 point en math       -> note finale +0.32 point.
+- +1 point en physique   -> note finale +0.36 point.
+- +1 point en français   -> note finale +0.31 point.
+- Les trois coefficients sont positifs et proches (~0.3) : la note
+  finale ressemble a une moyenne ponderee des trois matieres ;
+  la variable la plus influente est 'note physique'.
+
+=== PARTIE 5 : Evaluation du modele ===
+       Note reelle  Note predite  Erreur
+Eleve                                   
+1            17.10         17.30    0.20
+5            10.82          9.85   -0.97
+11           11.06         12.57    1.51
+13           12.27         10.82   -1.45
+19           15.52         15.70    0.18
+23           14.46         13.32   -1.14
+31           11.23         10.30   -0.93
+32           15.88         16.68    0.80
+34           11.30         11.54    0.24
+40            9.39          9.33   -0.06
+45           14.02         14.47    0.45
+46           13.72         14.44    0.72
+54           12.76         12.46   -0.30
+71            7.21          8.01    0.80
+74           14.11         14.01   -0.10
+77           10.16         10.37    0.21
+78           17.14         15.97   -1.17
+81           13.52         13.32   -0.20
+84            9.72          8.81   -0.91
+91           15.75         14.72   -1.03
+
+MAE  : 0.6682
+MSE  : 0.6532
 RMSE : 0.8082
-R2 : 0.9076
-Le MAE indique l'erreur absolue moyenne en points. Le RMSE, lui aussi en points, penalise davantage les grandes erreurs. Un R2 proche de 1 signifie que le modele explique une grande part de la variation des notes finales.
+R2   : 0.9076
 
-5. Exemple de nouvelle prediction
-Pour un eleve ayant les notes moyennes du CSV (note math : 12.30, note physique : 12.52, note français : 12.08), la note finale predite est 12.35/20.
-Selon le modele, un point supplementaire en mathematiques, a notes de physique et de francais constantes, modifie la note finale predite de 0.3198 point.
+Reponses :
+- MAE = erreur absolue moyenne : en moyenne le modele se trompe de
+  0.67 point sur la note finale.
+- Le MSE est en 'points au carre' ; la racine carree (RMSE) remet
+  l'erreur dans la meme unite que la note, donc plus facile a lire.
+  Le RMSE penalise davantage les grosses erreurs que le MAE.
+- R2 = 0.908 : proche de 1, le modele explique environ
+  91 % de la variation des notes finales.
+- (Equivalent de 'MAE = 30 DH') : ici MAE = 0.67, soit une
+  erreur moyenne d'environ 0.67 point sur 20 par eleve.
 
-Remarque : le CSV contient des notes scolaires et non les donnees de ventes de boulangerie du sujet. Le modele, les predictions et le graphique portent donc sur la note finale.
-Le travail supplementaire sur les commandes livrees ne peut pas etre effectue avec ce CSV : il ne contient ni donnees de boulangerie ni variable de commandes livrees.
+=== PARTIE 6 : Visualisation ===
+Graphique enregistre : comparaison_notes_reelles_predites.png
+Reponse : oui, les courbes reelle et predite se suivent de pres ;
+la plus grande erreur est de 1.51 point (eleve 11).
+
+=== PARTIE 7 : Nouvelle prediction ===
+Nouvel eleve : note math = 14, note physique = 12, note français = 15
+Note finale prevue : 13.60 / 20
+Interpretation : avec ces notes, le modele prevoit 13.60/20,
+coherent avec la moyenne ponderee des trois matieres.
+
+Question finale : si la note de math augmente de 2 points
+(physique et français inchanges), la note finale predite varie de
+  2 x a = 2 x 0.3198 = +0.64 point
+  (13.60 -> 14.24).
+(Les notes etant sur 20, on utilise +2 points au lieu des '+10 clients'
+ du sujet ; le raisonnement est identique : variation = coefficient x hausse.)
+
+=== TRAVAIL SUPPLEMENTAIRE ===
+1. Nouvelle variable independante : 'heures de révision' (par semaine).
+   (equivalent du 'nombre de commandes livrees' du sujet)
+   ATTENTION : le CSV du professeur ne contient pas cette variable ; ses
+   valeurs sont SIMULEES (graine fixe) a partir du niveau de l'eleve.
+2. 5 nouveaux eleves ajoutes -> 105 lignes
+   (fichier : donnees_enrichies_revision.csv).
+   Nouveaux eleves :
+ note math  note physique  note français  heures de révision  note finale
+      12.5           13.0           11.0                 6.0        11.95
+      17.0           16.5           14.0                 9.5        16.90
+       8.0            9.5           12.0                 3.0         9.59
+      15.5           11.0           16.5                 8.0        14.77
+      10.0           14.0            9.0                 4.5        10.45
+3. Les deux modeles sont reentraines sur le MEME dataset enrichi et le
+   MEME decoupage 80/20, pour une comparaison equitable.
+   Coefficients du nouveau modele :
+     note math : 0.2976
+     note physique : 0.3367
+     note français : 0.3008
+     heures de révision : 0.1196
+     constante : 0.1964
+4. Comparaison des performances :
+                   Ancien (3 variables)  Nouveau (4 variables)
+MAE                              0.9025                 0.8701
+MSE                              1.0273                 0.9792
+RMSE                             1.0136                 0.9896
+R2                               0.8368                 0.8445
+R2 valid. croisee                0.8715                 0.8774
+5. Conclusion : gain de R2 en validation croisee = +0.0059 ->
+   l'ajout de la variable n'ameliore PAS significativement les predictions.
+   Explication : les heures de revision sont deja fortement liees aux
+   trois notes ; elles apportent donc peu d'information nouvelle.
+   Ajouter une variable n'ameliore un modele que si elle apporte une
+   information que les autres variables ne contiennent pas deja.
+
+=== INTERPRETATION DES RESULTATS ===
+Le modele de regression lineaire multiple predit la note finale avec
+un R2 de 0.91 et une erreur moyenne (MAE) de 0.67 point.
+Les trois matieres contribuent positivement et de facon comparable,
+'note physique' ayant le poids le plus eleve. Le modele est fiable pour
+estimer la note finale d'un eleve a partir de ses trois notes.
