@@ -83,7 +83,7 @@ Le sujet de l'atelier (PDF du professeur) n'est pas inclus dans le dépôt.
 ## Installation
 
 ```bash
-git clone https://github.com/<votre-utilisateur>/prediction-notes-regression.git
+git clone https://github.com/wissalwissal202008/prediction-notes-regression.git
 cd prediction-notes-regression
 pip install -r requirements.txt
 ```
