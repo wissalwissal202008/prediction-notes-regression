@@ -9,5 +9,6 @@ venv/
 Thumbs.db
 desktop.ini
 
-# Sujet de l'atelier (document de cours, non publié)
+# Sujet de l'atelier (document de cours du professeur, non publié)
+Atelier 3_regression multiple_ chiffre daffaire_261111_143318.pdf
 *.pdf
