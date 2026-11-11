@@ -19,7 +19,7 @@ Le modèle explique environ **91 %** de la variation des notes finales sur le je
 
 ```
 ├── app.py                                    # Interface Streamlit
-├── regression_notes.py                                    # Chargement des données, entraînement, rapport et graphique
+├── regression_notes.py                       # Chargement des données, entraînement, rapport et graphique
 ├── donnees_regression_lineaire_multiple.csv  # Dataset (100 élèves, 4 colonnes)
 ├── resultats_atelier3.txt                    # Rapport généré par regression_notes.py
 ├── comparaison_notes_reelles_predites.png    # Graphique généré par regression_notes.py
