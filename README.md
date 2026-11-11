@@ -55,7 +55,7 @@ Le modèle explique environ **91 %** de la variation des notes finales sur le je
 
 ### Travail supplémentaire
 
-Ajout de la variable « heures de révision » et de 5 nouveaux élèves (105 lignes). Les deux modèles sont comparés sur le même dataset enrichi : le R² en validation croisée passe de 0,872 à 0,877 (+0,006). L'ajout de la variable n'améliore donc pas significativement les prédictions, car elle est déjà très liée aux trois notes. Les valeurs de cette variable sont **simulées**, puisque le CSV du professeur ne la contient pas. Elles sont ajoutées en mémoire : le projet n'utilise qu'un seul fichier CSV, celui du professeur.
+Ajout de la variable « heures de révision » et de 5 nouveaux élèves (105 lignes). Les deux modèles sont comparés sur le même dataset enrichi : le R² en validation croisée passe de 0,872 à 0,877 (+0,006). L'ajout de la variable n'améliore donc pas significativement les prédictions, car elle est déjà très liée aux trois notes. Le CSV a été amélioré comme le demande l'atelier : une colonne « heures de révision » a été ajoutée, ainsi que 5 nouveaux élèves (lignes 101 à 105). Les 100 élèves d'origine du professeur sont inchangés et servent aux parties 2 à 7. Les heures de révision et les 5 nouveaux élèves sont des valeurs **simulées**, car le CSV d'origine ne les contenait pas.
 
 | Modèle | MAE | RMSE | R² (test) | R² (validation croisée) |
 |--------|-----|------|-----------|-------------------------|
@@ -71,7 +71,7 @@ Ajout de la variable « heures de révision » et de 5 nouveaux élèves (105 li
 ```
 ├── app.py                                    # Interface Streamlit
 ├── regression_notes.py                       # Programme complet de l'atelier (parties 2 à 7 + travail supplémentaire)
-├── donnees_regression_lineaire_multiple.csv  # Dataset fourni par le professeur (100 élèves, 4 colonnes)
+├── donnees_regression_lineaire_multiple.csv  # Dataset du professeur amélioré (105 élèves, 5 colonnes)
 ├── resultats_atelier3.txt                    # Rapport : réponses, coefficients, métriques, interprétation
 ├── comparaison_notes_reelles_predites.png    # Graphique généré par regression_notes.py
 └── requirements.txt

@@ -8,10 +8,14 @@ Chaque partie de l'atelier est donc realisee sur ces notes :
     Y  = note finale
     Y  = a*X1 + b*X2 + c*X3 + d
 
+Le CSV a ete ameliore comme le demande le travail supplementaire :
+    - nouvelle colonne 'heures de révision' (valeurs simulees) ;
+    - 5 nouveaux eleves a la fin (lignes 101 a 105).
+Les parties 2 a 7 utilisent les 100 eleves d'origine et les 3 notes ;
+le travail supplementaire utilise les 105 eleves et les 4 variables.
+
 Execution : python regression_notes.py
-Sorties   : resultats_atelier3.txt, comparaison_notes_reelles_predites.png,
-Un seul CSV est utilise : celui du professeur. Les donnees du travail
-supplementaire sont construites en memoire a partir de ce CSV.
+Sorties   : resultats_atelier3.txt, comparaison_notes_reelles_predites.png
 """
 
 import sys
@@ -38,21 +42,15 @@ REPORT_PATH = BASE_DIR / "resultats_atelier3.txt"
 FEATURES = ["note math", "note physique", "note français"]
 TARGET = "note finale"
 NEW_FEATURE = "heures de révision"
+ALL_FEATURES = [*FEATURES, NEW_FEATURE]
+# Nombre d'eleves d'origine fournis par le professeur ; les lignes suivantes
+# sont les nouveaux eleves ajoutes pour le travail supplementaire.
+ORIGINAL_ROWS = 100
 
 # Partie 7 : nouvel eleve a predire (equivalent de la "nouvelle journee").
 NEW_STUDENT = {"note math": 14.0, "note physique": 12.0, "note français": 15.0}
 # Question finale : augmentation de la note de math (sans changer les autres).
 MATH_INCREASE = 2.0
-
-# Travail supplementaire : 5 nouveaux eleves (notes + heures de revision).
-NEW_STUDENTS = pd.DataFrame(
-    {
-        "note math": [12.5, 17.0, 8.0, 15.5, 10.0],
-        "note physique": [13.0, 16.5, 9.5, 11.0, 14.0],
-        "note français": [11.0, 14.0, 12.0, 16.5, 9.0],
-        NEW_FEATURE: [6.0, 9.5, 3.0, 8.0, 4.5],
-    }
-)
 
 
 # ---------------------------------------------------------------------------
@@ -115,25 +113,11 @@ def cross_validated_r2(df: pd.DataFrame, features: list[str]) -> float:
     return float(scores.mean())
 
 
-def build_enriched_dataset(df: pd.DataFrame, base_model: LinearRegression) -> pd.DataFrame:
-    """Travail supplementaire : ajoute la variable 'heures de révision' et 5 eleves.
-
-    Le CSV du professeur ne contient pas cette variable : ses valeurs sont
-    SIMULEES (graine fixe, donc reproductibles). Elles sont liees au niveau
-    general de l'eleve (moyenne des trois notes) plus un bruit aleatoire.
-    La note finale des 5 nouveaux eleves est simulee avec le modele de base
-    plus un petit bruit. A remplacer par de vraies donnees si disponibles.
-    """
-    rng = np.random.default_rng(42)
-    enriched = df.copy()
-    mean_grade = enriched[FEATURES].mean(axis=1)
-    hours = 0.5 * mean_grade + rng.normal(0, 1.5, len(enriched))
-    enriched.insert(len(FEATURES), NEW_FEATURE, hours.clip(0).round(1))
-
-    new_rows = NEW_STUDENTS.copy()
-    predicted = base_model.predict(new_rows[FEATURES])
-    new_rows[TARGET] = (predicted + rng.normal(0, 0.8, len(new_rows))).round(2)
-    return pd.concat([enriched, new_rows], ignore_index=True)
+def load_original_and_enriched() -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Renvoie (donnees d'origine : 100 eleves, 3 notes ; dataset complet ameliore)."""
+    enriched = load_dataset(CSV_PATH, ALL_FEATURES)
+    original = enriched.iloc[:ORIGINAL_ROWS][[*FEATURES, TARGET]]
+    return original, enriched
 
 
 # ---------------------------------------------------------------------------
@@ -148,7 +132,7 @@ def main() -> None:
     add = lines.extend
 
     # ---------------- Partie 2 : exploration ----------------
-    df = load_dataset()
+    df, enriched = load_original_and_enriched()
     info_buffer = StringIO()
     df.info(buf=info_buffer)
     add([
@@ -157,6 +141,7 @@ def main() -> None:
         "Adaptation du sujet : la 'boulangerie' est remplacee par les notes",
         "d'eleves du CSV. Clients/Publicite/Reduction -> notes math/physique/",
         "français, et le chiffre d'affaires -> note finale.",
+        f"Parties 2 a 7 : les {ORIGINAL_ROWS} eleves d'origine et les 3 notes.",
         "",
         "=== PARTIE 2 : Exploration du dataset ===",
         "Cinq premieres lignes :",
@@ -305,8 +290,8 @@ def main() -> None:
     ])
 
     # ---------------- Travail supplementaire ----------------
-    enriched = build_enriched_dataset(df, model)
-    features_new = [*FEATURES, NEW_FEATURE]
+    features_new = ALL_FEATURES
+    new_count = len(enriched) - ORIGINAL_ROWS
 
     Xo_train, Xo_test, yo_train, yo_test = split_data(enriched, FEATURES)
     Xn_train, Xn_test, yn_train, yn_test = split_data(enriched, features_new)
@@ -332,13 +317,13 @@ def main() -> None:
         "=== TRAVAIL SUPPLEMENTAIRE ===",
         f"1. Nouvelle variable independante : '{NEW_FEATURE}' (par semaine).",
         "   (equivalent du 'nombre de commandes livrees' du sujet)",
-        "   ATTENTION : le CSV du professeur ne contient pas cette variable ; ses",
-        "   valeurs sont SIMULEES (graine fixe) a partir du niveau de l'eleve.",
-        f"2. {len(NEW_STUDENTS)} nouveaux eleves ajoutes -> {len(enriched)} lignes",
-        f"   (construites en memoire a partir de {CSV_PATH.name}).",
+        "   Colonne ajoutee au CSV. ATTENTION : le CSV d'origine du professeur",
+        "   ne contenait pas cette variable ; ses valeurs sont SIMULEES, liees",
+        "   au niveau general de l'eleve (moyenne des 3 notes) plus un bruit.",
+        f"2. {new_count} nouveaux eleves ajoutes a la fin du CSV -> {len(enriched)} lignes.",
         "   Nouveaux eleves :",
-        enriched.tail(len(NEW_STUDENTS)).to_string(index=False),
-        "3. Les deux modeles sont reentraines sur le MEME dataset enrichi et le",
+        enriched.tail(new_count).to_string(index=False),
+        "3. Les deux modeles sont reentraines sur le MEME dataset ameliore et le",
         "   MEME decoupage 80/20, pour une comparaison equitable.",
         "   Coefficients du nouveau modele :",
         *[f"     {f} : {coef:.4f}" for f, coef in zip(features_new, new_model.coef_)],

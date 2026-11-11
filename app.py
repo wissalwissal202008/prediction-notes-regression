@@ -6,10 +6,10 @@ from regression_notes import (
     FEATURES,
     NEW_FEATURE,
     NEW_STUDENT,
-    build_enriched_dataset,
+    ORIGINAL_ROWS,
     calculate_metrics,
     cross_validated_r2,
-    load_dataset,
+    load_original_and_enriched,
     split_data,
     train_model,
 )
@@ -28,7 +28,7 @@ st.caption(
 )
 
 try:
-    df = load_dataset()
+    df, enriched = load_original_and_enriched()
 except (FileNotFoundError, ValueError, UnicodeDecodeError, pd.errors.ParserError) as error:
     st.error(f"Impossible de charger le fichier CSV : {error}")
     st.info(
@@ -113,10 +113,11 @@ st.caption(
 
 st.subheader("Travail supplémentaire : ajout des heures de révision")
 st.caption(
-    "Variable absente du CSV du professeur : valeurs simulées, ajoutées en "
-    "mémoire aux données du CSV (avec 5 nouveaux élèves)."
+    f"Le CSV contient une colonne « {NEW_FEATURE} » (valeurs simulées) et "
+    f"{len(enriched) - ORIGINAL_ROWS} nouveaux élèves ajoutés après les "
+    f"{ORIGINAL_ROWS} élèves d'origine."
 )
-enriched = build_enriched_dataset(df, model)
+st.dataframe(enriched.tail(len(enriched) - ORIGINAL_ROWS), width="stretch")
 rows = {}
 for label, features in {
     "Ancien (3 variables)": FEATURES,

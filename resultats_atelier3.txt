@@ -3,6 +3,7 @@ Jeu de donnees fourni : donnees_regression_lineaire_multiple.csv
 Adaptation du sujet : la 'boulangerie' est remplacee par les notes
 d'eleves du CSV. Clients/Publicite/Reduction -> notes math/physique/
 français, et le chiffre d'affaires -> note finale.
+Parties 2 a 7 : les 100 eleves d'origine et les 3 notes.
 
 === PARTIE 2 : Exploration du dataset ===
 Cinq premieres lignes :
@@ -148,10 +149,10 @@ Question finale : si la note de math augmente de 2 points
 === TRAVAIL SUPPLEMENTAIRE ===
 1. Nouvelle variable independante : 'heures de révision' (par semaine).
    (equivalent du 'nombre de commandes livrees' du sujet)
-   ATTENTION : le CSV du professeur ne contient pas cette variable ; ses
-   valeurs sont SIMULEES (graine fixe) a partir du niveau de l'eleve.
-2. 5 nouveaux eleves ajoutes -> 105 lignes
-   (construites en memoire a partir de donnees_regression_lineaire_multiple.csv).
+   Colonne ajoutee au CSV. ATTENTION : le CSV d'origine du professeur
+   ne contenait pas cette variable ; ses valeurs sont SIMULEES, liees
+   au niveau general de l'eleve (moyenne des 3 notes) plus un bruit.
+2. 5 nouveaux eleves ajoutes a la fin du CSV -> 105 lignes.
    Nouveaux eleves :
  note math  note physique  note français  heures de révision  note finale
       12.5           13.0           11.0                 6.0        11.95
@@ -159,7 +160,7 @@ Question finale : si la note de math augmente de 2 points
        8.0            9.5           12.0                 3.0         9.59
       15.5           11.0           16.5                 8.0        14.77
       10.0           14.0            9.0                 4.5        10.45
-3. Les deux modeles sont reentraines sur le MEME dataset enrichi et le
+3. Les deux modeles sont reentraines sur le MEME dataset ameliore et le
    MEME decoupage 80/20, pour une comparaison equitable.
    Coefficients du nouveau modele :
      note math : 0.2976
