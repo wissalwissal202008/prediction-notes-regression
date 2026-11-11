@@ -5,7 +5,7 @@ import streamlit as st
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 
-from mdl import (
+from regression_notes import (
     FEATURES,
     TARGET,
     calculate_metrics,
