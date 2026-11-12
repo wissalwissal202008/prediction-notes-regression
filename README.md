@@ -5,6 +5,8 @@ Projet de Machine Learning (Atelier 3) : prédire la **note finale** d'un élèv
 Le sujet de l'atelier décrit une boulangerie (clients, publicité, réduction → chiffre d'affaires). Le jeu de données fourni par le professeur contenant des notes d'élèves, chaque partie de l'atelier est appliquée à ce CSV :
 <img width="935" height="750" alt="image" src="https://github.com/user-attachments/assets/e1369504-17ab-4bad-93a0-cc6240c766e8" />
 
+<img width="1166" height="860" alt="image" src="https://github.com/user-attachments/assets/f3bb458e-c0e4-4fe7-86f8-9a37bb7baa83" />
+
 | Sujet (boulangerie) | Ce projet (CSV fourni) |
 |---------------------|------------------------|
 | X1 : nombre de clients | note math |
